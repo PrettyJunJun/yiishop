@@ -15,15 +15,14 @@ class BrandController extends Controller
     //>>显示
     public function actionIndex()
     {
-
         //>>总条数
-        $query = Brand::find()->where(['>=','status',0]);
+        $query = Brand::find()->where(['>=', 'status', 0]);
         //>>分页工具
         $pager = new Pagination([
             'totalCount' => $query->count(),
             'defaultPageSize' => 3
         ]);
-        $brand = $query->where(['>=','status',0])->limit($pager->limit)->offset($pager->offset)->all();
+        $brand = $query->where(['>=', 'status', 0])->limit($pager->limit)->offset($pager->offset)->all();
         //>.调用模型上的方法
 //        $brand = Brand::find()->all();
         //>>调用视图
@@ -111,7 +110,7 @@ class BrandController extends Controller
         //>>查找id
         $model = Brand::findOne(['id' => $id]);
 //        $model->status = -1;
-        $model->updateAttributes(['status'=>-1]);
+        $model->updateAttributes(['status' => -1]);
         //>>提示信息
 //        \Yii::$app->session->setFlash('success', '删除成功');
         //>>跳转页面

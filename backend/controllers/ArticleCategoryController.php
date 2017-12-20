@@ -12,17 +12,17 @@ class ArticleCategoryController extends \yii\web\Controller
     public function actionIndex()
     {
         //>>总条数
-        $query = ArticleCategory::find();
+        $query = ArticleCategory::find()->where(['>=', 'status', 0]);
         //>>分页工具
         $pager = new Pagination([
-            'totalCount' => $query->where(['>=','status',0])->count(),
+            'totalCount' => $query->count(),
             'defaultPageSize' => 3
         ]);
         //>>调用模型上的方法
 //        $article = ArticleCategory::find()->all();
-        $article = $query->where(['>=','status',0])->limit($pager->limit)->offset($pager->offset)->all();
+        $article = $query->where(['>=', 'status', 0])->limit($pager->limit)->offset($pager->offset)->all();
 
-        return $this->render('index', ['article_category' => $article,'pager'=>$pager]);
+        return $this->render('index', ['article_category' => $article, 'pager' => $pager]);
     }
 
     //>>添加
@@ -53,7 +53,7 @@ class ArticleCategoryController extends \yii\web\Controller
     }
 
     //>>修改
-   public function actionEdit($id)
+    public function actionEdit($id)
     {
         //>>显示页面
         $request = new Request();
@@ -83,12 +83,14 @@ class ArticleCategoryController extends \yii\web\Controller
     {
         //>>查找id
         $model = ArticleCategory::findOne(['id' => $id]);
-        $model->status = -1;
-        $model->save();
+
+        $model->updateAttributes(['status' => -1]);
+//        $model->status = -1;
+//        $model->save();
         //>>提示信息
-        \Yii::$app->session->setFlash('success', '删除成功');
+//        \Yii::$app->session->setFlash('success', '删除成功');
         //>>跳转页面
-        return $this->redirect(['article-category/index']);
+//        return $this->redirect(['article-category/index']);
 
     }
 }

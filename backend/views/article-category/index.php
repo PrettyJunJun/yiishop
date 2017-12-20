@@ -17,8 +17,7 @@
             <td>
                 <a href="<?= \yii\helpers\Url::to(['article-category/edit', 'id' => $articles->id]) ?>"
                    class="btn btn-warning">修改</a>
-                <a href="<?= \yii\helpers\Url::to(['article-category/delete', 'id' => $articles->id]) ?>?"
-                   class="btn btn-danger">删除</a>
+                <?= \yii\helpers\Html::button('删除', ['class' => 'btn btn-danger', 'id' => $articles->id]) ?>
             </td>
         </tr>
     <?php endforeach; ?>
@@ -31,18 +30,12 @@
 $url = \yii\helpers\Url::to(['article-category/delete']);
 $js =
     <<<JS
-        $('tr').on('click','.btn-warning',function() {
-var id = $('.btn-warning').closest('tr').attr('id');
+        $('.btn').click(function() {
+        var id = $(this).attr('id');
         $(this).closest('tr').remove();
-        if( confirm('是否删除')){
-                $.getJSON('$url?id='+id,function(data) {
-        if(data){
-        alert('删除成功');
-    }else{
-        alert('删除失败');
-        }
-    })
-        }
+        $.getJSON('$url?id='+id,function(data) {
+          
+        })
    });
 JS;
 $this->registerJs($js);
