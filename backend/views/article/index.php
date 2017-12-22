@@ -23,7 +23,7 @@
             </td>
             <td><?= date('Y-m-d H:i:s', $articles->create_time) ?></td>
             <td>
-                <a href="<?=\yii\helpers\Url::to(['article/edit', 'id' => $articles->id])?>" class="btn btn-warning">修改</a>
+                <a href="<?= \yii\helpers\Url::to(['article/edit', 'id' => $articles->id]) ?>" class="btn btn-warning">修改</a>
                 <?= \yii\helpers\Html::button('删除', ['class' => 'btn btn-danger', 'id' => $articles->id]) ?>
             </td>
 

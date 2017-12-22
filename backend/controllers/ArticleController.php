@@ -58,12 +58,14 @@ class ArticleController extends Controller
         $request = new Request();
         $model = new Article();
         //>>加载组件
-        $Categorys = ArticleCategory::find()->all();
-        $arr = [];
-        foreach ($Categorys as $val) {
-            $arr[$val['id']] = $val['name'];
-        }
-//        var_dump($arr);die;
+
+        $category = ArticleCategory::find()->all();
+        $options = ArrayHelper::map($category, 'id', 'name');
+//        $arr = [];
+//        foreach ($Categorys as $val) {
+//            $arr[$val['id']] = $val['name'];
+//        }
+////        var_dump($arr);die;
         if ($request->isPost) {
             //>>加载表单数据
             $model->load($request->post());
@@ -83,7 +85,7 @@ class ArticleController extends Controller
             }
         } else {
             //>>显示页面
-            return $this->render('add', ['model' => $model, 'arr' => $arr]);
+            return $this->render('add', ['model' => $model, 'options' => $options]);
         }
     }
 
@@ -93,12 +95,13 @@ class ArticleController extends Controller
         //>>显示页面
 //        var_dump($id);die;
         $request = new Request();
-        $model = Article::findOne(['id' => $id]);
-//        var_dump($model);die;
-        //>>详情页
+        $model = Article::findOne($id);
         $detail = ArticleDetail::find()->where(['article_id' => $id])->one();
-//       var_dump($detail);die;
+        // var_dump($detail);die;
         $model->content = $detail->content;
+//   var_dump($model);die;
+        //>>详情页
+
 //        var_dump($model->content);die;
         $category = ArticleCategory::find()->all();
         $options = ArrayHelper::map($category, 'id', 'name');

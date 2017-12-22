@@ -33,7 +33,8 @@ class Article extends ActiveRecord
     }
 
     //>>关联两张表
-    public function getArticleCategory(){
-        return $this->hasMany(ArticleCategory::className(),['id'=>'article_id']);
+    public function getArticleCategory()
+    {
+        return $this->hasMany(ArticleCategory::className(), ['id' => 'article_id']);
     }
 }
