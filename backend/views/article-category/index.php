@@ -30,13 +30,18 @@
 $url = \yii\helpers\Url::to(['article-category/delete']);
 $js =
     <<<JS
-        $('.btn').click(function() {
-        var id = $(this).attr('id');
-        $(this).closest('tr').remove();
-        $.getJSON('$url?id='+id,function(data) {
-          
-        })
-   });
+         $('tr').on('click','.btn-danger',function() {
+      var id = $(this).attr('id');
+      var result = confirm('您真的要删除吗');
+      if(result){
+          $(this).closest('tr').remove();
+          $.getJSON("$url?id="+id,function(data) {
+        if(data){
+        }else{
+            alert('删出失败')
+}      })
+      }
+    });
 JS;
 $this->registerJs($js);
 ?>

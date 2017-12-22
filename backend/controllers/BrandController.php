@@ -10,6 +10,8 @@ use yii\helpers\Json;
 use yii\web\Controller;
 use yii\web\Request;
 use yii\web\UploadedFile;
+use Qiniu\Auth;
+use Qiniu\Storage\UploadManager;
 
 class BrandController extends Controller
 {
@@ -79,7 +81,37 @@ class BrandController extends Controller
         $fileName = '/Upload/' . uniqid() . '.' . $img->extension;
         if ($img->saveAs(\Yii::getAlias('@webroot') . $fileName, 0)) {
             //>>上传成功 返回图片地址 方便回显
-            return Json::encode(['url' => $fileName]);
+            //===============上传到七牛云===============//
+            // 需要填写你的 Access Key 和 Secret Key
+            $accessKey = "KvQGKBBVS3A3EsHB0bkRD4C8f9VPz-K6lC4xplSr";
+            $secretKey = "MznndrSpB1-GdAXOeOyztSr5PJ-9L38MFDCGBhdK";
+            $bucket = "prettyboy";
+            $domian = 'p1ax7h9uq.bkt.clouddn.com';
+            // 构建鉴权对象
+            $auth = new Auth($accessKey, $secretKey);
+            // 生成上传 Token
+            $token = $auth->uploadToken($bucket);
+            // 要上传文件的本地路径
+            //$fileName = '/upload/1.jpg';
+            $filePath = \Yii::getAlias('@webroot') . $fileName;
+            // 上传到七牛后保存的文件名
+            $key = $fileName;
+            // 初始化 UploadManager 对象并进行文件的上传。
+            $uploadMgr = new UploadManager();
+            // 调用 UploadManager 的 putFile 方法进行文件的上传。
+            list($ret, $err) = $uploadMgr->putFile($token, $key, $filePath);
+            //echo "\n====> putFile result: \n";
+            if ($err !== null) {
+                //var_dump($err);
+                return Json::encode(['error' => '上传失败']);
+            } else {
+                //>>上传成功 图片访问地址 http://<domain>/<key>
+                //var_dump($ret);
+                $url = "http://{$domian}/{$key}";
+                return Json::encode(['url' => $url]);
+            }
+            //===============上传到七牛云===============//
+
         } else {
             //>>上传失败
             return Json::encode(['error' => '上传失败']);
@@ -134,6 +166,14 @@ class BrandController extends Controller
 //        \Yii::$app->session->setFlash('success', '删除成功');
         //>>跳转页面
 //        return $this->redirect(['brand/index']);
+
+    }
+
+    //>>处理七牛文件上传
+    public function actionQiniu()
+    {
+        //>>测试七牛云对象储存 文件上传
+
 
     }
 }
