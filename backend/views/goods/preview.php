@@ -4,7 +4,7 @@
             'items' => [
                 // 包含图片和字幕的格式
                 [
-                    'content' => '<img src="{$g->path}"/>',
+                    'content' => '<img src=""/>',
                     'caption' => '<h4>哈哈哈哈</h4><p>这是什么鬼</p>',
                     //'options' => [...],       //配置对应的样式
                 ],

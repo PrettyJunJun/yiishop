@@ -10,6 +10,7 @@ use backend\models\GoodsGallery;
 use backend\models\GoodsIntro;
 use Qiniu\Auth;
 use Qiniu\Storage\UploadManager;
+use yii\data\Pagination;
 use yii\helpers\Json;
 use yii\web\Controller;
 use yii\web\Request;
@@ -22,9 +23,34 @@ class GoodsController extends Controller
     //首页显示
     public function actionIndex()
     {
-        $form = Goods::find()->all();
+        //>>搜索
+        $request = \Yii::$app->request;
+        $form = Goods::find();
+        $sn = empty($request->get('sn')) ? '' : $request->get('sn');
+        $name = empty($request->get('name')) ? '' : $request->get('name');
+        $price_low = empty($request->get('price_low')) ? '' : $request->get('price_low');
+        $price_high = empty($request->get('price_high')) ? '' : $request->get('price_high');
+        if ($sn) {
+            $form->Where(['like', 'sn', $sn]);
+        }
+        if ($name) {
+            $form->andWhere(['like', 'name', $name]);
+        }
+        if ($price_low) {
+            $form->andWhere(['>', 'shop_price', $price_low]);
+        }
+        if ($price_high) {
+            $form->andWhere(['<', 'shop_price', $price_high]);
+        }
+        $pager = new Pagination([
+            'totalCount' => $form->count(),
+            'defaultPageSize' => 3
+        ]);
+        $rows = $form->andWhere(['>=', 'status', 0])->orderBy('sn asc')->limit($pager->limit)->offset($pager->offset)->all();
         $barend = Brand::find()->all();
         $goods_category = GoodsCategory::find()->all();
+        //>>分页工具
+
         $v = [];
         foreach ($barend as $bar) {
             $v[$bar->id] = $bar->name;
@@ -35,7 +61,7 @@ class GoodsController extends Controller
             $f[$goods->id] = $goods->name;
         }
 //        var_dump($f);die;
-        return $this->render('index', ['form' => $form, 'v' => $v, 'f' => $f]);
+        return $this->render('index', ['rows' => $rows, 'v' => $v, 'f' => $f, 'pager' => $pager]);
     }
 
     //添加
@@ -152,9 +178,12 @@ class GoodsController extends Controller
         $file = '/upload/goods/' . uniqid() . '.' . $img->extension;
         //如果图片上传成功就保存
         if ($img->saveAs(\Yii::getAlias('@webroot') . $file)) {
-            //七牛-------------------------
+            //========================七牛云=================//
+            //>>AK
             $accessKey = "KvQGKBBVS3A3EsHB0bkRD4C8f9VPz-K6lC4xplSr";
+            //>>SK
             $secretKey = "MznndrSpB1-GdAXOeOyztSr5PJ-9L38MFDCGBhdK";
+            //>>空间名称
             $bucket = "prettyboy";
             //>>七牛云地址
             $domain = 'p1ax7h9uq.bkt.clouddn.com';
@@ -179,7 +208,7 @@ class GoodsController extends Controller
                 $url = "http://{$domain}/{$key}";
                 echo Json::encode(['url' => $url]);
             }
-            //七牛-------------------------
+            //========================七牛云=================//
         } else {
             echo json_encode(false);
         }

@@ -1,3 +1,21 @@
+<form id="" class="form-inline" action="" method="get" role="form">
+    <div class="form-group">
+        <input type="text" class="form-control" name="name" placeholder="商品名称">
+    </div>
+    <div class="form-group ">
+        <input type="text" class="form-control" name="sn" placeholder="货号" aria-invalid="false">
+    </div>
+    <div class="form-group">
+        <input type="text" class="form-control" name="price_low" placeholder="￥">
+    </div>
+    <div class="form-group">
+        <input type="text"  class="form-control" name="price_high" placeholder="￥">
+    </div>
+    <button type="submit" class="btn btn-default ">
+        <span class=" glyphicon glyphicon-search">搜索</span>
+    </button>
+</form>
+
 <table class="table table-bordered" style="text-align: center">
     <tr style="color: #7a43b6">
         <th style="text-align: center">ID</th>
@@ -16,7 +34,7 @@
         <th style="text-align: center">浏览次数</th>
         <th style="text-align: center">操作</th>
     </tr>
-    <?php foreach ($form as $r): ?>
+    <?php foreach ($rows as $r): ?>
         <tr>
             <td><?= $r->id ?></td>
             <td><?= $r->name ?></td>
@@ -39,11 +57,10 @@
             <td><?= date('Y-m-d H:i:s', $r->create_time) ?></td>
             <td><?= $r->view_times ?></td>
             <td>
-                <?= \yii\helpers\Html::a('相册', ['goods/gallery', 'id' => $r->id], ['class' => 'btn btn-info']) ?>
-                <?= \yii\helpers\Html::button('删除', ['class' => 'btn btn-danger', 'id' => $r->id]) ?>
                 <?= \yii\helpers\Html::a('修改', ['goods/edit', 'id' => $r->id], ['class' => 'btn btn-warning']) ?>
-
-                <?= \yii\helpers\Html::a('预览', ['goods/preview', 'id' => $r->id], ['class' => 'btn btn-info']) ?>
+                <?= \yii\helpers\Html::button('删除', ['class' => 'btn btn-danger', 'id' => $r->id]) ?><br/>
+                <?= \yii\helpers\Html::a('相册', ['goods/gallery', 'id' => $r->id], ['class' => 'btn btn-info glyphicon glyphicon-picture']) ?>
+                <?= \yii\helpers\Html::a('预览', ['goods/preview', 'id' => $r->id], ['class' => 'btn btn-success glyphicon glyphicon-eye-open']) ?>
             </td>
         </tr>
     <?php endforeach; ?>
@@ -74,3 +91,12 @@ $js = <<<JS
 JS;
 $this->registerJs($js);
 ?>
+
+<!--分页显示-->
+<?= \yii\widgets\LinkPager::widget([
+    'pagination' => $pager,
+    'nextPageLabel' => '下一页',
+    'prevPageLabel' => '上一页',
+]) ?>
+
+
