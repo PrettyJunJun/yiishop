@@ -3,11 +3,11 @@
 /* @var $this \yii\web\View */
 /* @var $content string */
 
-use backend\assets\AppAsset;
 use yii\helpers\Html;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
+use frontend\assets\AppAsset;
 use common\widgets\Alert;
 
 AppAsset::register($this);
@@ -35,15 +35,19 @@ AppAsset::register($this);
         ],
     ]);
     $menuItems = [
-        ['label' => '主页', 'url' => ['/site/index']],
+        ['label' => '首页', 'url' => ['/site/index']],
+//        ['label' => '商品列表', 'url' => ['goods/index']],
+//        ['label' => '学生列表', 'url' => ['student/index']],
     ];
     if (Yii::$app->user->isGuest) {
-        $menuItems[] = ['label' => '登录', 'url' => ['/site/login']];
+        $menuItems[] = ['label' => '登录', 'url' => ['/user/login']];
+
+//        $menuItems[] = ['label' => '注册', 'url' => ['/user/login']];
     } else {
         $menuItems[] = '<li>'
-            . Html::beginForm(['/site/logout'], 'post')
+            . Html::beginForm(['/user/logout'], 'post')
             . Html::submitButton(
-                'Logout (' . Yii::$app->user->identity->username . ')',
+                '注销 (' . Yii::$app->user->identity->username . ')',
                 ['class' => 'btn btn-link logout']
             )
             . Html::endForm()

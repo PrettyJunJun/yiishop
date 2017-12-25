@@ -42,6 +42,7 @@ class GoodsController extends Controller
         if ($price_high) {
             $form->andWhere(['<', 'shop_price', $price_high]);
         }
+        //>>分页工具
         $pager = new Pagination([
             'totalCount' => $form->count(),
             'defaultPageSize' => 3
@@ -49,7 +50,6 @@ class GoodsController extends Controller
         $rows = $form->andWhere(['>=', 'status', 0])->orderBy('sn asc')->limit($pager->limit)->offset($pager->offset)->all();
         $barend = Brand::find()->all();
         $goods_category = GoodsCategory::find()->all();
-        //>>分页工具
 
         $v = [];
         foreach ($barend as $bar) {

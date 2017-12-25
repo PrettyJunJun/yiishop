@@ -9,11 +9,9 @@
         <input type="text" class="form-control" name="price_low" placeholder="￥">
     </div>
     <div class="form-group">
-        <input type="text"  class="form-control" name="price_high" placeholder="￥">
+        <input type="text" class="form-control" name="price_high" placeholder="￥">
     </div>
-    <button type="submit" class="btn btn-default ">
-        <span class=" glyphicon glyphicon-search">搜索</span>
-    </button>
+    <button type="submit" class="btn btn-info glyphicon glyphicon-search">搜索</button>
 </form>
 
 <table class="table table-bordered" style="text-align: center">

@@ -1,5 +1,5 @@
 <?php
-echo \yii\helpers\Html::a('返回', ['goods/index'], ['class' => 'btn btn-primary']);
+echo \yii\helpers\Html::a('返回', ['goods/index'], ['class' => 'btn btn-primary glyphicon glyphicon-arrow-left']);
 /**
  * @var $this \yii\web\View
  */
@@ -65,7 +65,7 @@ $this->registerJs($js);
             <td>
                 <img src="<?= $img->path ?>"></td>
             <td>
-                <?= \yii\helpers\Html::button('删除', ['class' => 'btn btn-primary', 'id' => $img->id]) ?>
+                <?= \yii\helpers\Html::button('删除', ['class' => 'btn btn-danger', 'id' => $img->id]) ?>
             </td>
         </tr>
     <?php endforeach; ?>
