@@ -15,6 +15,7 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return [
             [['username', 'password_hash', 'email', 'status'], 'required'],
+            ['email','email']
         ];
     }
 
@@ -52,7 +53,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public static function findIdentityByAccessToken($token, $type = null)
     {
-        // TODO: Implement findIdentityByAccessToken() method.
+        return static::findOne(['access_token' => $token]);
     }
 
     /**
@@ -78,7 +79,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function getAuthKey()
     {
-        // TODO: Implement getAuthKey() method.
+        return $this->auth_key;
     }
 
     /**
@@ -91,6 +92,18 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function validateAuthKey($authKey)
     {
-        // TODO: Implement validateAuthKey() method.
+        return $this->getAuthKey() === $authKey;
+    }
+
+    //>>添加成功在表中生成和存储每个用户的认证密钥
+    public function beforeSave($insert)
+    {
+        if (parent::beforeSave($insert)) {
+            if ($this->isNewRecord) {
+                $this->auth_key = \Yii::$app->security->generateRandomString();
+            }
+            return true;
+        }
+        return false;
     }
 }

@@ -96,7 +96,7 @@ class GoodsController extends Controller
                 //获取时间
                 $model->create_time = time();
                 //>>生成当前日期和编号后四位
-                $model->sn = date('Ymd') . str_pad($count->count, 4, 0, 0);
+                $model->sn = date('Ymd') . str_pad($count->count, 4, 0, STR_PAD_LEFT);
                 $model->save();
                 $content->goods_id = $model->id;
                 $content->save();

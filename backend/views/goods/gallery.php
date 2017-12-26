@@ -63,7 +63,8 @@ $this->registerJs($js);
     <?php foreach ($model as $img): ?>
         <tr>
             <td>
-                <img src="<?= $img->path ?>"></td>
+                <img src="<?= $img->path ?>">
+            </td>
             <td>
                 <?= \yii\helpers\Html::button('删除', ['class' => 'btn btn-danger', 'id' => $img->id]) ?>
             </td>

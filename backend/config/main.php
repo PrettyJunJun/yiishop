@@ -19,7 +19,7 @@ return [
         ],
         'user' => [
             'identityClass' => 'backend\models\User',
-            'enableAutoLogin' => true,
+            'enableAutoLogin' => true,//启用默认登录
             'identityCookie' => ['name' => '_identity-backend', 'httpOnly' => true],
         ],
         'session' => [
