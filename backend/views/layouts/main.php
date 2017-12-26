@@ -35,7 +35,40 @@ AppAsset::register($this);
         ],
     ]);
     $menuItems = [
-        ['label' => '首页', 'url' => ['/site/index']],
+        [
+            'label' => '品牌管理',
+            'items' => [
+                ['label' => '品牌列表', 'url' => ['/brand/index']],
+            ],
+        ],
+        [
+            'label' => '文章管理',
+            'items' => [
+                ['label' => '文章列表', 'url' => ['/article/index']],
+                ['label' => '文章分类', 'url' => ['/article-category/index']],
+            ],
+        ],
+        [
+            'label'=>'商品管理',
+            'items'=>[
+                    ['label'=>'商品列表','url'=>['/goods/index']],
+                    ['label'=>'商品分类','url'=>['/goods-category/index']],
+            ],
+        ],
+        [
+            'label'=>'用户管理',
+            'items'=>[
+                ['label'=>'用户列表','url'=>['/user/index']],
+            ],
+        ],
+        [
+            'label'=>'RBAC',
+            'items'=>[
+                ['label'=>'权限列表','url'=>['/rbac/index']],
+                ['label'=>'角色列表','url'=>['/role/index']],
+            ],
+        ]
+
 //        ['label' => '商品列表', 'url' => ['goods/index']],
 //        ['label' => '学生列表', 'url' => ['student/index']],
     ];

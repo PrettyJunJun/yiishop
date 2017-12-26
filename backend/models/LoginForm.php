@@ -50,7 +50,7 @@ class LoginForm extends Model
                 }
                 //>>密码正确
                 //>>将用户信息保存到session中
-                \Yii::$app->user->login($admin,$auth_key);
+                \Yii::$app->user->login($admin, $auth_key);
                 return true;
             } else {
                 //>>提示信息
