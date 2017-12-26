@@ -1,4 +1,4 @@
-<table class="table table-bordered" style="text-align: center">
+<table class="table table-bordered" style="text-align: center" id="table_id_example" class="display">
     <tr style="color: #7a43b6">
         <th style="text-align: center">名称</th>
         <th style="text-align: center">描述</th>

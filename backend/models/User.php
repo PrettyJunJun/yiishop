@@ -10,12 +10,18 @@ class User extends ActiveRecord implements IdentityInterface
     //>>验证码
     public $code;
 
+    //>>旧密码
+    public $newpassword;
+    //>>确认密码
+    public $confirm;
+
     //>>指定规则
     public function rules()
     {
         return [
-            [['username', 'password_hash', 'email', 'status'], 'required'],
-            ['email','email']
+            [['newpassword','confirm','username', 'password_hash', 'email', 'status'], 'required'],
+            ['email','email'],
+            ['confirm', 'compare', 'compareAttribute'=>'confirm'],
         ];
     }
 
@@ -23,13 +29,27 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return [
             'username' => '用户名',
-            'password_hash' => '密码',
+            'password_hash' => '新密码',
+            'newpassword'=>'密码',
+            'confirm'=>'确认密码',
             'email' => '邮箱',
             'status' => '状态',
 
         ];
     }
-
+    //>>验证旧密码是否正确
+    public function verifpwd(){
+        $users = User::findOne(['username'=>$this->username]);
+        if ($users){
+            //>>把新密码和旧密码
+            if (\Yii::$app->security->validatePassword($this->newpassword,$users->password_hash)){
+                return true;
+            }else{
+                return false;
+            }
+        }
+        return false;
+    }
     /**
      * Finds an identity by the given ID.
      * @param string|int $id the ID to be looked for

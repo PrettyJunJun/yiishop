@@ -58,19 +58,22 @@ class UserController extends Controller
         $model = User::findOne(['id' => $id]);
         if ($request->isPost) {
             $model->load($request->post());
-            if ($model->validate()) {
-                //>>保存
-                $model->save(false);
-                //>>设置提示信息
-                \Yii::$app->session->setFlash('success', '修改成功');
-                //>跳转首页
-                return $this->redirect(['user/index']);
-            } else {
-                //>>失败打印错误信息
-                var_dump($model->getErrors());
-            }
+                if ($model->verifpwd()){
+//                    var_dump($model);die;
+                    $model->password_hash = \Yii::$app->security->generatePasswordHash($model->password_hash);
+                    //>>保存
+                    $model->save(false);
+                    //>>设置提示信息
+                    \Yii::$app->session->setFlash('success', '修改成功');
+                    //>跳转首页
+                    return $this->redirect(['user/index']);
+                }else{
+                    $model->addError('newpassword','密码不一致');
+                }
+
         } else {
-            return $this->render('add', ['model' => $model]);
+            $model->password_hash = '';
+            return $this->render('password', ['model' => $model]);
         }
     }
 
