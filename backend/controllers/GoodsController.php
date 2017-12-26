@@ -26,21 +26,22 @@ class GoodsController extends Controller
         //>>搜索
         $request = \Yii::$app->request;
         $form = Goods::find();
+        //>>接受表单传过来的值
         $sn = empty($request->get('sn')) ? '' : $request->get('sn');
         $name = empty($request->get('name')) ? '' : $request->get('name');
-        $price_low = empty($request->get('price_low')) ? '' : $request->get('price_low');
-        $price_high = empty($request->get('price_high')) ? '' : $request->get('price_high');
+        $price_max = empty($request->get('price_max')) ? '' : $request->get('price_max');
+        $price_min = empty($request->get('price_min')) ? '' : $request->get('price_min');
         if ($sn) {
             $form->Where(['like', 'sn', $sn]);
         }
         if ($name) {
             $form->andWhere(['like', 'name', $name]);
         }
-        if ($price_low) {
-            $form->andWhere(['>', 'shop_price', $price_low]);
+        if ($price_max) {
+            $form->andWhere(['>', 'shop_price', $price_max]);
         }
-        if ($price_high) {
-            $form->andWhere(['<', 'shop_price', $price_high]);
+        if ($price_min) {
+            $form->andWhere(['<', 'shop_price', $price_min]);
         }
         //>>分页工具
         $pager = new Pagination([
@@ -51,17 +52,20 @@ class GoodsController extends Controller
         $barend = Brand::find()->all();
         $goods_category = GoodsCategory::find()->all();
 
-        $v = [];
-        foreach ($barend as $bar) {
-            $v[$bar->id] = $bar->name;
+        //>>定义一个空数组
+        $value = [];
+        //>>遍历输出brand表 把它的id作为它的键  把name作为值
+        foreach ($barend as $barends) {
+            $value[$barends->id] = $barends->name;
         }
 //        var_dump($v);die;
-        $f = [];
+        //>>遍历输出goods_category表  把它的id作为键 把name作为值
+        $category = [];
         foreach ($goods_category as $goods) {
-            $f[$goods->id] = $goods->name;
+            $category[$goods->id] = $goods->name;
         }
 //        var_dump($f);die;
-        return $this->render('index', ['rows' => $rows, 'v' => $v, 'f' => $f, 'pager' => $pager]);
+        return $this->render('index', ['rows' => $rows, 'value' => $value, 'category' => $category, 'pager' => $pager]);
     }
 
     //添加
@@ -76,10 +80,12 @@ class GoodsController extends Controller
             $model->load($request->post());
             $content->load($request->post());
             if ($model->validate() && $content->validate()) {
+                //>>保存添加时间
                 $time = date('Y-m-d', time());
                 $count = GoodsDayCount::find()->where(['day' => $time])->one();
                 //判断是添加还是修改
                 if ($count) {
+                    //>>如果是添加 把当前时间和添加商品加1
                     $count->count += 1;
                 } else {
                     $count = new GoodsDayCount();
@@ -89,6 +95,7 @@ class GoodsController extends Controller
                 $count->save();
                 //获取时间
                 $model->create_time = time();
+                //>>生成当前日期和编号后四位
                 $model->sn = date('Ymd') . str_pad($count->count, 4, 0, 0);
                 $model->save();
                 $content->goods_id = $model->id;
@@ -98,11 +105,13 @@ class GoodsController extends Controller
             }
         } else {
             $barend = Brand::find()->all();
-            $v = [];
-            foreach ($barend as $bar) {
-                $v[$bar->id] = $bar->name;
+            //>>定义一个空数组
+            $values = [];
+            //>>遍历输出barend表  把id作为键 把name作为值
+            foreach ($barend as $barends) {
+                $values[$barends->id] = $barends->name;
             }
-            return $this->render('add', ['model' => $model, 'v' => $v, 'content' => $content]);
+            return $this->render('add', ['model' => $model, 'values' => $values, 'content' => $content]);
         }
     }
 
@@ -117,6 +126,7 @@ class GoodsController extends Controller
         if ($request->isPost) {
             $model->load($request->post());
             $content->load($request->post());
+            //>>验证goods和goodsintro传过来的数据
             if ($model->validate() && $content->validate()) {
                 $model->save();
                 $content->save();
@@ -125,17 +135,20 @@ class GoodsController extends Controller
             }
         } else {
             $barend = Brand::find()->all();
-            $v = [];
-            foreach ($barend as $bar) {
-                $v[$bar->id] = $bar->name;
+            //>>定义空数组
+            $values = [];
+            //>>遍历遍历barend表 把id作为键 把name作为值
+            foreach ($barend as $barends) {
+                $values[$barends->id] = $barends->name;
             }
-            return $this->render('add', ['model' => $model, 'v' => $v, 'content' => $content]);
+            return $this->render('add', ['model' => $model, 'values' => $values, 'content' => $content]);
         }
     }
 
     //相册
     public function actionGallery($id)
     {
+        //>>根据id查询出的所有数据
         $model = GoodsGallery::find()->where(['goods_id' => $id])->all();
         return $this->render('gallery', ['model' => $model, 'id' => $id]);
     }
@@ -143,11 +156,11 @@ class GoodsController extends Controller
     //保存图片
     public function actionGalleryAdd()
     {
-        $re = \Yii::$app->request;
-        if ($re->isPost) {
+        $result = \Yii::$app->request;
+        if ($result->isPost) {
             $gallery = new GoodsGallery();
-            $gallery->goods_id = $re->post('id');
-            $gallery->path = $re->post('resu');
+            $gallery->goods_id = $result->post('id');
+            $gallery->path = $result->post('resu');
             $gallery->save();
             $id = \Yii::$app->db->getLastInsertID();
             return Json::encode(['id' => $id]);
@@ -158,13 +171,16 @@ class GoodsController extends Controller
     //相册删除
     public function actionGalleryDelete($id)
     {
-        $re = GoodsGallery::deleteAll(['id' => $id]);
-        echo json_encode($re);
+        //>>根据id删除对应数据
+        $result = GoodsGallery::deleteAll(['id' => $id]);
+        //>>使用json
+        echo json_encode($result);
     }
 
     //预览
     public function actionPreview($id)
     {
+        //>>根据对应id查询出对应数据
         $coutent = GoodsIntro::find()->where(['goods_id' => $id])->all();
         $gallery = GoodsGallery::find()->where(['goods_id' => $id])->all();
         return $this->render('preview', ['content' => $coutent, 'gallery' => $gallery]);
@@ -232,6 +248,7 @@ class GoodsController extends Controller
     //删除
     public function actionDelete($id)
     {
+        //>>查询对应id,根据id删除对应数据
         $result = Goods::deleteAll(['id' => $id]);
         GoodsIntro::deleteAll(['goods_id' => $id]);
         echo json_encode($result);

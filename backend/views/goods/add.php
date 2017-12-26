@@ -56,6 +56,7 @@ $this->registerJsFile('@web/zTree/js/jquery.ztree.core.js', [
 ]);
 $nodes = \backend\models\GoodsCategory::getNodes();
 $url = \yii\helpers\Url::to(['goods-category/edit']);
+//>>判断goods_category_id是否存在
 if ($model->goods_category_id) {
     $id = $model->goods_category_id;
 } else {
@@ -98,7 +99,7 @@ echo <<<HTML
 HTML;
 //======================zTree=====================
 //品牌分类
-echo $form->field($model, 'brand_id')->dropDownList($v);
+echo $form->field($model, 'brand_id')->dropDownList($values);
 echo $form->field($model, 'market_price')->textInput();
 echo $form->field($model, 'shop_price')->textInput();
 echo $form->field($model, 'stock')->textInput();

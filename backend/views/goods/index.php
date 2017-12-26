@@ -6,10 +6,10 @@
         <input type="text" class="form-control" name="sn" placeholder="货号" aria-invalid="false">
     </div>
     <div class="form-group">
-        <input type="text" class="form-control" name="price_low" placeholder="￥">
+        <input type="text" class="form-control" name="price_max" placeholder="￥">
     </div>
     <div class="form-group">
-        <input type="text" class="form-control" name="price_high" placeholder="￥">
+        <input type="text" class="form-control" name="price_min" placeholder="￥">
     </div>
     <button type="submit" class="btn btn-info glyphicon glyphicon-search">搜索</button>
 </form>
@@ -32,33 +32,33 @@
         <th style="text-align: center">浏览次数</th>
         <th style="text-align: center">操作</th>
     </tr>
-    <?php foreach ($rows as $r): ?>
+    <?php foreach ($rows as $row): ?>
         <tr>
-            <td><?= $r->id ?></td>
-            <td><?= $r->name ?></td>
-            <td><?= $r->sn ?></td>
-            <td><img src="<?= $r->logo ?>" width="50px"></td>
-            <td><?= $f[$r->goods_category_id] ?></td>
-            <td><?= $v[$r->brand_id] ?></td>
-            <td><?= $r->market_price ?></td>
-            <td><?= $r->shop_price ?></td>
-            <td><?= $r->stock ?></td>
+            <td><?= $row->id ?></td>
+            <td><?= $row->name ?></td>
+            <td><?= $row->sn ?></td>
+            <td><img src="<?= $row->logo ?>" width="50px"></td>
+            <td><?= $category[$row->goods_category_id] ?></td>
+            <td><?= $value[$row->brand_id] ?></td>
+            <td><?= $row->market_price ?></td>
+            <td><?= $row->shop_price ?></td>
+            <td><?= $row->stock ?></td>
             <td>
-                <?= $r->is_on_sale == 0 ? '下架' : '' ?>
-                <?= $r->is_on_sale == 1 ? '在销' : '' ?>
+                <?= $row->is_on_sale == 0 ? '下架' : '' ?>
+                <?= $row->is_on_sale == 1 ? '在销' : '' ?>
             </td>
             <td>
-                <?= $r->status == 0 ? '回收站' : '' ?>
-                <?= $r->status == 1 ? '正常' : '' ?>
+                <?= $row->status == 0 ? '回收站' : '' ?>
+                <?= $row->status == 1 ? '正常' : '' ?>
             </td>
-            <td><?= $r->sort ?></td>
-            <td><?= date('Y-m-d H:i:s', $r->create_time) ?></td>
-            <td><?= $r->view_times ?></td>
+            <td><?= $row->sort ?></td>
+            <td><?= date('Y-m-d H:i:s', $row->create_time) ?></td>
+            <td><?= $row->view_times ?></td>
             <td>
-                <?= \yii\helpers\Html::a('修改', ['goods/edit', 'id' => $r->id], ['class' => 'btn btn-warning']) ?>
-                <?= \yii\helpers\Html::button('删除', ['class' => 'btn btn-danger', 'id' => $r->id]) ?><br/>
-                <?= \yii\helpers\Html::a('相册', ['goods/gallery', 'id' => $r->id], ['class' => 'btn btn-info glyphicon glyphicon-picture']) ?>
-                <?= \yii\helpers\Html::a('预览', ['goods/preview', 'id' => $r->id], ['class' => 'btn btn-success glyphicon glyphicon-eye-open']) ?>
+                <?= \yii\helpers\Html::a('修改', ['goods/edit', 'id' => $row->id], ['class' => 'btn btn-warning']) ?>
+                <?= \yii\helpers\Html::button('删除', ['class' => 'btn btn-danger', 'id' => $row->id]) ?><br/>
+                <?= \yii\helpers\Html::a('相册', ['goods/gallery', 'id' => $row->id], ['class' => 'btn btn-info glyphicon glyphicon-picture']) ?>
+                <?= \yii\helpers\Html::a('预览', ['goods/preview', 'id' => $row->id], ['class' => 'btn btn-success glyphicon glyphicon-eye-open']) ?>
             </td>
         </tr>
     <?php endforeach; ?>
