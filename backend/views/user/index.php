@@ -18,8 +18,8 @@
             <td><?= $row->status == 1 ? '启用' : '' ?><?= $row->status == 0 ? '禁用' : '' ?></td>
 
             <td>
-                <?= \yii\helpers\Html::a('修改', ['user/edit', 'id' => $row->id], ['class' => 'btn btn-warning']) ?>
-                <?= \yii\helpers\Html::a('删除', ['user/delete', 'id' => $row->id], ['class' => 'btn btn-danger']) ?>
+                <?= \yii\helpers\Html::a('修改', ['user/edit', 'id' => $row->id], ['class' => 'btn btn-warning glyphicon glyphicon-cog']) ?>
+                <?= \yii\helpers\Html::a('删除', ['user/delete', 'id' => $row->id], ['class' => 'btn btn-danger glyphicon glyphicon-trash']) ?>
             </td>
         </tr>
     <?php endforeach;?>

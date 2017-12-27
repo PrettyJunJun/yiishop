@@ -3,6 +3,7 @@
 namespace backend\controllers;
 
 use backend\models\LoginForm;
+use backend\models\Password;
 use backend\models\User;
 use yii\captcha\CaptchaAction;
 use yii\data\Pagination;
@@ -12,6 +13,7 @@ use yii\web\Request;
 class UserController extends Controller
 {
     public $enableCsrfValidation = false;
+
     //>>显示页面
     public function actionIndex()
     {
@@ -40,7 +42,7 @@ class UserController extends Controller
                 //>>设置提示信息
                 \Yii::$app->session->setFlash('success', '添加成功');
                 //>>跳转首页
-                $this->redirect(['user/index']);
+                return $this->redirect(['user/index']);
             } else {
                 //>>失败后打印错误信息
                 var_dump($model->getErrors());
@@ -58,30 +60,57 @@ class UserController extends Controller
         $model = User::findOne(['id' => $id]);
         if ($request->isPost) {
             $model->load($request->post());
-                if ($model->verifpwd()){
-//                    var_dump($model);die;
-                    $model->password_hash = \Yii::$app->security->generatePasswordHash($model->password_hash);
-                    //>>保存
-                    $model->save(false);
-                    //>>设置提示信息
-                    \Yii::$app->session->setFlash('success', '修改成功');
-                    //>跳转首页
-                    return $this->redirect(['user/index']);
-                }else{
-                    $model->addError('newpassword','密码不一致');
-                }
+            if ($model->validate()) {
+                $model->save(false);
+                //>>设置提示信息
+                \Yii::$app->session->setFlash('success', '修改成功');
+                //>跳转首页
+                return $this->redirect(['user/index']);
+            } else {
+                //>>失败后打印错误信息
+                var_dump($model->getErrors());
+            }
 
         } else {
-            $model->password_hash = '';
-            return $this->render('password', ['model' => $model]);
+            return $this->render('add', ['model' => $model]);
         }
     }
 
+    //>>修改密码
+    public function actionModify()
+    {
+
+        $id = \Yii::$app->user->identity->id;
+        $user = User::findOne(['id' => $id]);
+        $model = new Password();
+        $request = new Request();
+        if ($request->isPost) {
+            $model->load($request->post());
+            if ($model->validate()) {
+//                var_dump($model);die;
+                $model->oldpassword = \Yii::$app->security->generatePasswordHash($model->newpassword);
+                $user->password_hash = $model->oldpassword;
+                $user->save(false);
+                //>>设置提示信息
+                \Yii::$app->session->setFlash('success', '修改成功');
+
+                //$model->password_hash = \Yii::$app->security->generatePasswordHash($model->password_hash);
+                //>跳转首页
+                return $this->redirect(['user/index']);
+            } else {
+                //>>失败后打印错误信息
+                var_dump($model->getErrors());
+            };
+        };
+        return $this->render('password', ['model' => $model]);
+    }
+
     //>>删除
-    public function actionDelete($id){
-        User::findOne(['id'=>$id])->delete();
+    public function actionDelete($id)
+    {
+        User::findOne(['id' => $id])->delete();
         //>>提示信息
-        \Yii::$app->session->setFlash('success','删除成功');
+        \Yii::$app->session->setFlash('success', '删除成功');
         //>>跳转页面
         return $this->redirect(['user/index']);
     }
@@ -98,13 +127,15 @@ class UserController extends Controller
             ]
         ];
     }
+
     //>>登录
-    public function actionLogin(){
+    public function actionLogin()
+    {
         //>>登录表单
         $model = new LoginForm();
         //>>接受表单提交的数据
         $request = \Yii::$app->request;
-        if ($request->isPost){
+        if ($request->isPost) {
             $model->load($request->post());
             if ($model->login()) {
                 //>>最后登录时间和IP
@@ -126,5 +157,5 @@ class UserController extends Controller
 
         return $this->redirect(['user/login']);
     }
-    
+
 }

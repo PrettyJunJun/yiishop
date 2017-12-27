@@ -22,6 +22,8 @@ class RbacController extends Controller
     public function actionAddPermission()
     {
         $model = new PermissionForm();
+        //>>指定当前场景 如果没有指定就是默认场景
+        $model->scenario = PermissionForm::SCENARIO_ADD_PERMISSION;
         $request = \Yii::$app->request;
         if ($request->isPost) {
             $model->load($request->post());
@@ -43,6 +45,8 @@ class RbacController extends Controller
         $permission = $authManager->getPermission($name);
         $names = $permission->name;
         $model = new PermissionForm();
+        $model->scenario = PermissionForm::SCENARIO_EDIT_PERMISSION;
+        //>>赋值回显
         $model->name = $permission->name;
         $model->description = $permission->description;
         //>>post保存
@@ -70,8 +74,8 @@ class RbacController extends Controller
         $permission = $authManager->getPermission($name);
         $authManager->remove($permission);
         //>>提示信息
-        \Yii::$app->session->setFlash('success', '删除成功');
-        //>>跳转页面
-        return $this->redirect(['rbac/index']);
+//        \Yii::$app->session->setFlash('success', '删除成功');
+//        //>>跳转页面
+//        return $this->redirect(['rbac/index']);
     }
 }

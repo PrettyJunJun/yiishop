@@ -59,6 +59,7 @@ AppAsset::register($this);
             'label'=>'用户管理',
             'items'=>[
                 ['label'=>'用户列表','url'=>['/user/index']],
+                ['label'=>'修改密码','url'=>['/user/modify','id'=>Yii::$app->user->id]],
             ],
         ],
         [
@@ -66,6 +67,12 @@ AppAsset::register($this);
             'items'=>[
                 ['label'=>'权限列表','url'=>['/rbac/index']],
                 ['label'=>'角色列表','url'=>['/role/index']],
+            ],
+        ],
+        [
+            'label'=>'菜单管理',
+            'items'=>[
+                ['label'=>'菜单列表','url'=>['/rbac/index']],
             ],
         ]
 

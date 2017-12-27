@@ -9,9 +9,10 @@ class User extends ActiveRecord implements IdentityInterface
 {
     //>>验证码
     public $code;
-
-    //>>旧密码
+    //>>新密码
     public $newpassword;
+    //>>旧密码
+    public $oldpassword;
     //>>确认密码
     public $confirm;
 
@@ -19,9 +20,9 @@ class User extends ActiveRecord implements IdentityInterface
     public function rules()
     {
         return [
-            [['newpassword','confirm','username', 'password_hash', 'email', 'status'], 'required'],
-            ['email','email'],
-            ['confirm', 'compare', 'compareAttribute'=>'confirm'],
+            [['username', 'password_hash', 'email', 'status'], 'required'],
+            ['email', 'email'],
+            [['newpassword', 'oldpassword', 'confirm'], 'validateRe']
         ];
     }
 
@@ -29,27 +30,43 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return [
             'username' => '用户名',
-            'password_hash' => '新密码',
-            'newpassword'=>'密码',
-            'confirm'=>'确认密码',
+            'password_hash' => '密码',
+            'oldpassword' => '旧密码',
+            'newpassword' => '新密码',
+            'confirm' => '确认密码',
             'email' => '邮箱',
             'status' => '状态',
 
         ];
     }
-    //>>验证旧密码是否正确
-    public function verifpwd(){
-        $users = User::findOne(['username'=>$this->username]);
-        if ($users){
-            //>>把新密码和旧密码
-            if (\Yii::$app->security->validatePassword($this->newpassword,$users->password_hash)){
-                return true;
-            }else{
-                return false;
+
+    //>>验证密码规则
+    public function validateRe()
+    {
+        if ($this->oldpassword) {
+            //>>判断是否填写旧密码
+            if (!$this->newpassword) {
+                $this->addError('newpassword', '新密码不能为空');
+            } elseif (!$this->confirm) {
+                //>>确认密码不能为空
+                $this->addError('confirm', '确认密码不能为空');
+            } elseif ($this->newpassword && $this->confirm) {
+                //>>两次密码是否一致
+                if ($this->newpassword !== $this->confirm) {
+                    $this->addError('newpassword', '新密码和确认密码不一致');
+                } else {
+                    $password = \Yii::$app->security->validatePassword($this->oldpassword, $this->password_hash);
+                    if (!$password) {
+                        $this->addError('oldpassword', '旧密码填写错误');
+                    }
+                }
             }
+        } else {
+            //>>如果没有填写旧密码 就不修改
+            $this->addError('oldpassword', '旧密码不能为空');
         }
-        return false;
     }
+
     /**
      * Finds an identity by the given ID.
      * @param string|int $id the ID to be looked for
