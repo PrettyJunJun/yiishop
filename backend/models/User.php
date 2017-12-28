@@ -15,12 +15,15 @@ class User extends ActiveRecord implements IdentityInterface
     public $oldpassword;
     //>>确认密码
     public $confirm;
+    //>>添加用户权限
+    public $roles;
 
     //>>指定规则
     public function rules()
     {
         return [
             [['username', 'password_hash', 'email', 'status'], 'required'],
+            [['roles'], 'default', 'value' => null],
             ['email', 'email'],
             [['newpassword', 'oldpassword', 'confirm'], 'validateRe']
         ];
@@ -36,6 +39,7 @@ class User extends ActiveRecord implements IdentityInterface
             'confirm' => '确认密码',
             'email' => '邮箱',
             'status' => '状态',
+            'roles' => '添加角色'
 
         ];
     }

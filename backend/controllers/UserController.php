@@ -7,6 +7,7 @@ use backend\models\Password;
 use backend\models\User;
 use yii\captcha\CaptchaAction;
 use yii\data\Pagination;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\Request;
 
@@ -29,8 +30,13 @@ class UserController extends Controller
     //>>添加
     public function actionAdd()
     {
-        $request = new Request();
         $model = new User();
+        //>>获取所有角色
+        $authManager = \Yii::$app->authManager;
+        $roles = $authManager->getRoles();
+        //>>把name作为键 description作为值
+        $authManagers = ArrayHelper::map($roles, 'name', 'description');
+        $request = new Request();
         if ($request->isPost) {
             //>>加载表单数据
             $model->load($request->post());
@@ -39,6 +45,14 @@ class UserController extends Controller
                 $model->password_hash = \Yii::$app->security->generatePasswordHash($model->password_hash);
                 //>>保存
                 $model->save(false);
+                //>>给用户添加角色
+                if ($model->roles) {
+                    foreach ($model->roles as $rows) {
+                        $name = $authManager->getRole($rows);
+                        $authManager->assign($name, $model->id);
+                    }
+                }
+//                var_dump($model->roles);die;
                 //>>设置提示信息
                 \Yii::$app->session->setFlash('success', '添加成功');
                 //>>跳转首页
@@ -47,21 +61,41 @@ class UserController extends Controller
                 //>>失败后打印错误信息
                 var_dump($model->getErrors());
             }
-        } else {
-            return $this->render('add', ['model' => $model]);
         }
+        return $this->render('add', ['model' => $model, 'authManagers' => $authManagers]);
     }
 
     //>>修改
     public function actionEdit($id)
     {
-        $request = new Request();
         //>.回显
         $model = User::findOne(['id' => $id]);
+        //>>修改用户和角色
+        $authManager = \Yii::$app->authManager;
+        $roles = $authManager->getRoles();
+        $authManagers = ArrayHelper::map($roles, 'name', 'description');
+        //>>定义空数组
+        $rows = [];
+        //>>遍历出所有角色
+        $name = $authManager->getRolesByUser($id);
+        foreach ($name as $role) {
+            $rows[] = $role->name;
+        }
+        $model->roles = $rows;
+        $request = new Request();
         if ($request->isPost) {
             $model->load($request->post());
             if ($model->validate()) {
                 $model->save(false);
+                //>>修改清除所有角色
+                $authManager->revokeAll($id);
+                //>>给用户添加角色
+                if ($model->roles) {
+                    foreach ($model->roles as $role) {
+                        $role = $authManager->getRole($role);
+                        $authManager->assign($role, $id);
+                    }
+                }
                 //>>设置提示信息
                 \Yii::$app->session->setFlash('success', '修改成功');
                 //>跳转首页
@@ -72,7 +106,7 @@ class UserController extends Controller
             }
 
         } else {
-            return $this->render('add', ['model' => $model]);
+            return $this->render('add', ['model' => $model, 'authManagers' => $authManagers]);
         }
     }
 
