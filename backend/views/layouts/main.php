@@ -34,56 +34,13 @@ AppAsset::register($this);
             'class' => 'navbar-inverse navbar-fixed-top',
         ],
     ]);
-    $menuItems = [
-        [
-            'label' => '品牌管理',
-            'items' => [
-                ['label' => '品牌列表', 'url' => ['/brand/index']],
-            ],
-        ],
-        [
-            'label' => '文章管理',
-            'items' => [
-                ['label' => '文章列表', 'url' => ['/article/index']],
-                ['label' => '文章分类', 'url' => ['/article-category/index']],
-            ],
-        ],
-        [
-            'label'=>'商品管理',
-            'items'=>[
-                    ['label'=>'商品列表','url'=>['/goods/index']],
-                    ['label'=>'商品分类','url'=>['/goods-category/index']],
-            ],
-        ],
-        [
-            'label'=>'用户管理',
-            'items'=>[
-                ['label'=>'用户列表','url'=>['/user/index']],
-                ['label'=>'修改密码','url'=>['/user/modify','id'=>Yii::$app->user->id]],
-            ],
-        ],
-        [
-            'label'=>'RBAC',
-            'items'=>[
-                ['label'=>'权限列表','url'=>['/rbac/index']],
-                ['label'=>'角色列表','url'=>['/role/index']],
-            ],
-        ],
-        [
-            'label'=>'菜单管理',
-            'items'=>[
-                ['label'=>'菜单列表','url'=>['/rbac/index']],
-            ],
-        ]
-
-//        ['label' => '商品列表', 'url' => ['goods/index']],
-//        ['label' => '学生列表', 'url' => ['student/index']],
-    ];
+    $menuItems =[];
     if (Yii::$app->user->isGuest) {
         $menuItems[] = ['label' => '登录', 'url' => ['/user/login']];
 
 //        $menuItems[] = ['label' => '注册', 'url' => ['/user/login']];
     } else {
+        $menuItems = Yii::$app->user->identity->getMenus();
         $menuItems[] = '<li>'
             . Html::beginForm(['/user/logout'], 'post')
             . Html::submitButton(

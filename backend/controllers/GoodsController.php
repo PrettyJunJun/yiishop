@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use backend\filters\RbacFilter;
 use backend\models\Brand;
 use backend\models\Goods;
 use backend\models\GoodsCategory;
@@ -253,4 +254,13 @@ class GoodsController extends Controller
         GoodsIntro::deleteAll(['goods_id' => $id]);
         echo json_encode($result);
     }
+
+//    public function behaviors()
+//    {
+//        return [
+//            'rbac'=>[
+//                'class'=>RbacFilter::className()
+//            ]
+//        ];
+//    }
 }

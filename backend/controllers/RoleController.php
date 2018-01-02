@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use backend\filters\RbacFilter;
 use backend\models\Role;
 use function PHPSTORM_META\type;
 use yii\helpers\ArrayHelper;
@@ -111,4 +112,13 @@ class RoleController extends Controller
 //        \Yii::$app->session->setFlash('success','删除成功');
 //        return $this->redirect(['role/index']);
     }
+
+//    public function behaviors()
+//    {
+//        return [
+//            'rbac'=>[
+//                'class'=>RbacFilter::className()
+//            ]
+//        ];
+//    }
 }

@@ -43,8 +43,8 @@ $this->registerJs($js);
         <th style="text-align: center">操作</th>
     </tr>
     </thead>
-        <tbody>
-        <?php foreach ($authManager as $authManagers): ?>
+    <tbody>
+    <?php foreach ($authManager as $authManagers): ?>
         <tr>
             <td><?= $authManagers->name ?></td>
             <td><?= $authManagers->description ?></td>
@@ -53,8 +53,8 @@ $this->registerJs($js);
                 <?= \yii\helpers\Html::button('删除', ['class' => 'btn btn-danger glyphicon glyphicon-trash', 'name' => $authManagers->name]) ?>
             </td>
         </tr>
-        <?php endforeach; ?>
-        </tbody>
+    <?php endforeach; ?>
+    </tbody>
     <tr>
         <td colspan="3">
             <?= \yii\helpers\Html::a('添加', ['rbac/add-permission'], ['class' => 'btn btn-info']) ?>

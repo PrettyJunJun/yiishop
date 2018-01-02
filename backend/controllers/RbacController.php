@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use backend\filters\RbacFilter;
 use backend\models\PermissionForm;
 use yii\rbac\Permission;
 use yii\web\Controller;
@@ -78,4 +79,13 @@ class RbacController extends Controller
 //        //>>跳转页面
 //        return $this->redirect(['rbac/index']);
     }
+
+//    public function behaviors()
+//    {
+//        return [
+//            'rbac'=>[
+//                'class'=>RbacFilter::className()
+//            ]
+//        ];
+//    }
 }

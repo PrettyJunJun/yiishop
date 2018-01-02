@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use backend\filters\RbacFilter;
 use backend\models\LoginForm;
 use backend\models\Password;
 use backend\models\User;
@@ -41,7 +42,7 @@ class UserController extends Controller
             //>>加载表单数据
             $model->load($request->post());
             if ($model->validate()) {
-                //>>对密码进行加密
+                //>>添加时对密码进行加密
                 $model->password_hash = \Yii::$app->security->generatePasswordHash($model->password_hash);
                 //>>保存
                 $model->save(false);
@@ -177,7 +178,7 @@ class UserController extends Controller
                 User::updateAll(['last_login_time' => date('Y-m-d H:i:s', time()), 'last_login_ip' => $_SERVER['REMOTE_ADDR']], ['id' => $session->id]);
                 //>>提示信息
                 \Yii::$app->session->setFlash('success', '登录成功');
-                //>>跳转
+                //>>跳转首页
                 return $this->redirect(['user/index']);
             }
         }
@@ -191,5 +192,6 @@ class UserController extends Controller
 
         return $this->redirect(['user/login']);
     }
+
 
 }

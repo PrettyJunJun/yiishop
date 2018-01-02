@@ -21,8 +21,8 @@
                 <?=$brands->status==-1?'删除':''?>
             </td>
             <td>
-                <a href="<?=\yii\helpers\Url::to(['brand/edit','id'=>$brands->id])?>" class="btn btn-warning">修改</a>
-                <?=\yii\helpers\Html::button('删除',['class'=>'btn btn-danger','id'=>$brands->id])?>
+                <a href="<?=\yii\helpers\Url::to(['brand/edit','id'=>$brands->id])?>" class="btn btn-warning glyphicon glyphicon-cog">修改</a>
+                <?=\yii\helpers\Html::button('删除',['class'=>'btn btn-danger glyphicon glyphicon-trash','id'=>$brands->id])?>
             </td
         </tr>
     <?php endforeach;?>

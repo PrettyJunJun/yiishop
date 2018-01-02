@@ -1,6 +1,5 @@
 <table class="table table-bordered" style="text-align: center">
     <tr style="color: #7a43b6">
-        <th style="text-align: center">ID</th>
         <th style="text-align: center">商品名称</th>
         <th style="text-align: center">上级分类ID</th>
         <th style="text-align: center">简介</th>
@@ -8,14 +7,13 @@
     </tr>
     <?php foreach ($goods_category as $category): ?>
         <tr>
-            <td><?= $category->id ?></td>
             <td><?= $category->name ?></td>
             <td><?= $category->parent_id ?></td>
             <td><?= $category->intro ?></td>
             <td>
                 <a href="<?= \yii\helpers\Url::to(['goods-category/edit', 'id' => $category->id]) ?>"
-                   class="btn btn-warning">修改</a>
-                <?= \yii\helpers\Html::button('删除', ['class' => 'btn btn-danger', 'id' => $category->id]) ?>
+                   class="btn btn-warning glyphicon glyphicon-cog">修改</a>
+                <?= \yii\helpers\Html::button('删除', ['class' => 'btn btn-danger glyphicon glyphicon-trash', 'id' => $category->id]) ?>
             </td>
         </tr>
     <?php endforeach; ?>

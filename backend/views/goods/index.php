@@ -16,7 +16,6 @@
 
 <table class="table table-bordered" style="text-align: center">
     <tr style="color: #7a43b6">
-        <th style="text-align: center">ID</th>
         <th style="text-align: center">商品名</th>
         <th style="text-align: center">货号</th>
         <th style="text-align: center">LOGO图片</th>
@@ -34,7 +33,6 @@
     </tr>
     <?php foreach ($rows as $row): ?>
         <tr>
-            <td><?= $row->id ?></td>
             <td><?= $row->name ?></td>
             <td><?= $row->sn ?></td>
             <td><img src="<?= $row->logo ?>" width="50px"></td>

@@ -3,6 +3,7 @@
 namespace backend\controllers;
 
 //>>品牌
+use backend\filters\RbacFilter;
 use backend\models\ArticleCategory;
 use backend\models\Brand;
 use yii\data\Pagination;
@@ -175,5 +176,14 @@ class BrandController extends Controller
         //>>测试七牛云对象储存 文件上传
 
 
+    }
+
+    public function behaviors()
+    {
+        return [
+            'rbac'=>[
+                'class'=>RbacFilter::className()
+            ]
+        ];
     }
 }

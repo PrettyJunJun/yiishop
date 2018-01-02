@@ -147,4 +147,35 @@ class User extends ActiveRecord implements IdentityInterface
         }
         return false;
     }
+
+    //>>获取菜单
+    public function getMenus()
+    {
+        $menuItems = [];
+        //>>获取所有父级菜单
+        $menus = Menu::find()->where(['parent_id' => 0])->all();
+        foreach ($menus as $menu) {
+            //>>获取子分类
+            $children = Menu::find()->where(['parent_id' => $menu->id])->all();
+            $items = [];
+            foreach ($children as $child) {
+                //>>判断用户是否有显示菜单的权限
+                if (\Yii::$app->user->can($child->url)){
+                    $items[] = ['label' => $child->name, 'url' => [$child->url]];
+                }
+            }
+//            $items = [
+//                ['label'=>'','url'=>['']]
+//            ];
+            //>>没有子菜单的不需要显示
+            if ($items){
+                $menuItems[] = ['label' => $menu->name, 'items' => $items];
+            }
+        }
+//        $items = [
+//            ['label'=>'','url'=>['']]
+//        ];
+//        $menuItems[] = ['label'=>'','items'=>$items];
+        return $menuItems;
+    }
 }

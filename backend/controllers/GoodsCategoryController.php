@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use backend\filters\RbacFilter;
 use backend\models\GoodsCategory;
 use yii\data\Pagination;
 use yii\web\Request;
@@ -16,7 +17,7 @@ class GoodsCategoryController extends \yii\web\Controller
         //>>分页工具
         $pager = new Pagination([
             'totalCount' => $query->count(),
-            'defaultPageSize' => 3
+            'defaultPageSize' => 10
         ]);
         $article = $query->limit($pager->limit)->offset($pager->offset)->all();
         return $this->render('index', ['goods_category' => $article, 'pager' => $pager]);
@@ -121,4 +122,13 @@ class GoodsCategoryController extends \yii\web\Controller
             echo json_encode($r);
         }
     }
+
+//    public function behaviors()
+//    {
+//        return [
+//            'rbac'=>[
+//                'class'=>RbacFilter::className()
+//            ]
+//        ];
+//    }
 }
