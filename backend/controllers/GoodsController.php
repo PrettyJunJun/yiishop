@@ -47,7 +47,7 @@ class GoodsController extends Controller
         //>>分页工具
         $pager = new Pagination([
             'totalCount' => $form->count(),
-            'defaultPageSize' => 3
+            'defaultPageSize' => 5
         ]);
         $rows = $form->andWhere(['>=', 'status', 0])->orderBy('sn asc')->limit($pager->limit)->offset($pager->offset)->all();
         $barend = Brand::find()->all();

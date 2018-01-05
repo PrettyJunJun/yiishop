@@ -41,8 +41,10 @@ class GoodsListController extends Controller
         //>>根据id查询商品
         $row = Goods::find()->where(['id' => $id])->one();
         //>>品牌
-        $brand = Brand::find()->where(['id' => $row->brand_id])->one();
-        $row->brand_id = $brand->name;
+//        $brand = Brand::find()->where(['id' => $row->brand_id])->one();
+//        $row->brand_id = $brand->name;
+        $row->view_times = $row->view_times + 1;
+        $row->save();
 //        var_dump($gallerys);die;
         return $this->render('goods', ['row' => $row, 'intro' => $intro, 'gallerys' => $gallerys]);
     }

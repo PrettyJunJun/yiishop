@@ -11,13 +11,13 @@ return [
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'controllerNamespace' => 'frontend\controllers',
-    'layout'=>false,
+    'layout'=>'header',
     'components' => [
         'request' => [
             'csrfParam' => '_csrf-frontend',
         ],
         'user' => [
-            'identityClass' => 'common\models\User',
+            'identityClass' => 'frontend\models\member',
             'enableAutoLogin' => true,
             'identityCookie' => ['name' => '_identity-frontend', 'httpOnly' => true],
         ],
@@ -37,14 +37,22 @@ return [
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
-        /*
+        'sms'=>[
+            'class'=>\frontend\components\Sms::className(),
+            'ak'=>'LTAI1DAmqPQWcyTq',
+            'sk'=>'AqBcHOPOlfW1WLf2zncagPYYZWDHOq',
+            'sign'=>'峻峻超市',
+            'template'=>'SMS_120120330',
+
+        ],
+
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
             ],
         ],
-        */
+
     ],
     'params' => $params,
 ];
