@@ -207,7 +207,7 @@
                     </li>
                     <!-- 此处的星级切换css即可 默认为5星 star4 表示4星 star3 表示3星 star2表示2星 star1表示1星 -->
                 </ul>
-                <form action="" method="post" class="choose">
+                <form action="<?= \yii\helpers\Url::to(['user/add-cart']) ?>" method="get" class="choose">
                     <ul>
 
                         <li>
@@ -225,6 +225,8 @@
                             <dl>
                                 <dt>&nbsp;</dt>
                                 <dd>
+                                    <input type="hidden" name="r" value="user/add-cart"/>
+                                    <input type="hidden" name="goods_id" value="<?= $row->id ?>"/>
                                     <input type="submit" value="" class="add_btn"/>
                                 </dd>
                             </dl>

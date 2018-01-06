@@ -24,12 +24,9 @@
         </div>
         <div class="topnav_right fr">
             <ul>
+                <li><?= Yii::$app->user->isGuest ? "游客" : Yii::$app->user->identity->username ?>
+                    您好！欢迎来到京西！<?= Yii::$app->user->isGuest ? '[<a href="' . \yii\helpers\Url::to(['user/login']) . '">登录</a>][<a href="' . yii\helpers\Url::to(['user/regist']) . '">免费注册</a>]' : '[<a href="' . \yii\helpers\Url::to(['user/logout']) . '">注销</a>]' ?> </li>
 
-                <li><?= Yii::$app->user->isGuest ? '您好' : Yii::$app->user->identity->username ?>欢迎来到京西！[<a
-                            href="<?= \yii\helpers\Url::to(['user/logout']) ?>">注销</a>][<a
-                            href="<?= \yii\helpers\Url::to(['user/login']) ?>">登录</a>] [<a
-                            href="<?= \yii\helpers\Url::to(['user/regist']) ?>">免费注册</a>]
-                </li>
                 <li class="line">|</li>
                 <li>我的订单</li>
                 <li class="line">|</li>
@@ -47,7 +44,7 @@
 <div class="header w1210 bc mt15">
     <!-- 头部上半部分 start 包括 logo、搜索、用户中心和购物车结算 -->
     <div class="logo w1210">
-        <h1 class="fl"><a href="index.html"><img src="/images/logo.png" alt="京西商城"></a></h1>
+        <h1 class="fl"><a href="http://www.yiishop.com"><img src="/images/jd.png" width="150px" alt="京西商城"></a></h1>
         <!-- 头部搜索 start -->
         <div class="search fl">
             <div class="search_form">
@@ -118,14 +115,14 @@
         <div class="cart fl">
             <dl>
                 <dt>
-                    <a href="">去购物车结算</a>
+                    <a href="<?= \yii\helpers\Url::to(['user/cart']) ?>">去购物车结算</a>
                     <b></b>
                 </dt>
-                <dd>
-                    <div class="prompt">
-                        购物车中还没有商品，赶紧选购吧！
-                    </div>
-                </dd>
+                <!--                <dd>-->
+                <!--                    <div class="prompt">-->
+                <!--                        购物车中还没有商品，赶紧选购吧！-->
+                <!--                    </div>-->
+                <!--                </dd>-->
             </dl>
         </div>
         <!-- 购物车 end -->
