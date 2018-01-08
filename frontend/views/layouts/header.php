@@ -44,7 +44,7 @@
 <div class="header w1210 bc mt15">
     <!-- 头部上半部分 start 包括 logo、搜索、用户中心和购物车结算 -->
     <div class="logo w1210">
-        <h1 class="fl"><a href="http://www.yiishop.com"><img src="/images/jd.png" width="150px" alt="京西商城"></a></h1>
+        <h1 class="fl"><a href=""><img src="/images/jd.png" width="150px" alt="京西商城"></a></h1>
         <!-- 头部搜索 start -->
         <div class="search fl">
             <div class="search_form">
