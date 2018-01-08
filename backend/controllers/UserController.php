@@ -193,5 +193,13 @@ class UserController extends Controller
         return $this->redirect(['user/login']);
     }
 
+//    public function behaviors()
+//    {
+//        return [
+//            'rbac'=>[
+//                'class'=>RbacFilter::className()
+//            ]
+//        ];
+//    }
 
 }

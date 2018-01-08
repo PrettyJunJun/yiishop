@@ -80,12 +80,12 @@ class RbacController extends Controller
 //        return $this->redirect(['rbac/index']);
     }
 
-//    public function behaviors()
-//    {
-//        return [
-//            'rbac'=>[
-//                'class'=>RbacFilter::className()
-//            ]
-//        ];
-//    }
+    public function behaviors()
+    {
+        return [
+            'rbac'=>[
+                'class'=>RbacFilter::className()
+            ]
+        ];
+    }
 }
