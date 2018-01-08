@@ -2,17 +2,21 @@
 
 namespace frontend\controllers;
 
+
 use backend\models\Goods;
 use frontend\models\Address;
 use frontend\models\Cart;
 use frontend\models\DetailAddress;
 use frontend\models\LoginForm;
 use frontend\models\Member;
+use frontend\models\Order;
+use frontend\models\OrderGoods;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 use yii\web\Controller;
 use yii\web\Cookie;
 use yii\web\Request;
+use yii\db\Exception;
 
 class UserController extends Controller
 {
@@ -332,7 +336,7 @@ class UserController extends Controller
                         $arr[$g_id] = $count;
                     }
                 }
-                var_dump($arr);
+//                var_dump($arr);
                 $cookies = \Yii::$app->response->cookies;
                 $cookie = new Cookie();
                 $cookie->name = 'cart';
@@ -346,6 +350,138 @@ class UserController extends Controller
             $cart->save(false);
             return json_encode(true);
         }
+    }
+
+    //>>购物车结算
+    public function actionOrder()
+    {
+
+        //判断用户是否登录,如果用户没有登录 就跳到登录页面
+        if (\Yii::$app->user->isGuest) {
+            return $this->redirect(['user/login']);
+        } else {
+            $request = new Request();
+            if ($request->isPost) {
+                $model = new Order();
+                $model->load($request->post(), '');
+                $address = Address::findOne(['id' => $model->address_id]);
+//                var_dump($model);die;
+                if (!$address) {
+                    return $this->jump(3, '/user/address.php', '收获地址不存在,请填写有效的收货地址');
+                }
+                //>>开启事务
+                $transaction = \Yii::$app->db->beginTransaction();
+                try {
+                    $carts = Cart::find()->where(['member_id' => \Yii::$app->user->id])->all();
+                    $values = DetailAddress::findOne(['address_id' => $address->id]);
+                    //>>遍历购物车里面的商品信息
+                    foreach ($carts as $cart) {
+                        $num = Goods::find()->where(['id' => $cart->goods_id])->one();
+                        if ($num->stock >= $cart->amount) {
+                            $model->member_id = \Yii::$app->user->id;
+                            $model->name = $address->name;
+                            $model->province = $address->province;
+                            $model->city = $address->city;
+                            $model->area = $address->area;
+                            $model->address = $values->detail_address;
+                            $model->tel = $address->phone;
+                            $model->delivery_price = $num->shop_price;
+//                            var_dump($address);die;
+//                            var_dump($model->delivery_id);die;
+                            $model->delivery_name = Order::$delivery[$model->delivery_id][0];
+//                            var_dump($model->payment_id);die;
+                            $model->payment_name = Order::$payment[$model->payment_id][0];
+                            $value = 0;
+                            $value += $num->shop_price * $cart->amount;
+                            $model->total = $value;
+                            $model->status = 1;
+                            $model->create_time = time();
+                            if ($model->validate()) {
+                                $model->save();
+                                $id = \Yii::$app->db->getLastInsertID();
+
+                                $ordergoods = new OrderGoods();
+                                $ordergoods->order_id = $id;
+                                $ordergoods->goods_id = $num->id;
+                                $ordergoods->goods_name = $num->name;
+                                $ordergoods->logo = $num->logo;
+                                $ordergoods->price = $num->shop_price;
+                                $ordergoods->amount = $cart->amount;
+                                $ordergoods->total = $num->shop_price * $cart->amount;
+                                $ordergoods->member_id = \Yii::$app->user->id;
+                                $ordergoods->save();
+                                $transaction->commit();
+                                Goods::updateAll(['stock' => $num->stock - $cart->amount], ['id' => $cart->goods_id]);
+                                Cart::deleteAll(['id' => $cart->id]);
+                            } else {
+                                var_dump($model->getErrors());
+                                die;
+                            }
+                        } else {
+                            throw new Exception('商品的库存不足');//抛出异常
+                        }
+                    }
+                    return $this->tishi(1, 'details');
+
+                } catch (Exception $e) {//>>捕获异常
+                    $transaction->rollBack();//>>事务回滚
+                    $this->jump(5, '/user/cart.php', $num->name . '商品的库存不足');
+//                    $this->render(['user/order']);
+                }
+            } else {
+                $address = Address::find()->where(['member_id' => \Yii::$app->user->id])->all();//地址的处理
+                $carts = Cart::find()->where(['member_id' => \Yii::$app->user->id])->all();
+                $arr = ArrayHelper::map($carts, 'goods_id', 'goods_id');
+                $cart = ArrayHelper::map($carts, 'goods_id', 'amount');
+                $goods = Goods::find()->where(['id' => $arr])->all();
+                $num = Goods::find()->where(['id' => $arr])->count();//商品的件数
+                return $this->render('order', ['address' => $address, 'goods' => $goods, 'cart' => $cart, 'num' => $num]);
+            }
+        }
+    }
+
+    //>>订单详情
+    public function actionDetails()
+    {
+        //判断用户是否登录
+        if (\Yii::$app->user->isGuest) {
+            return $this->redirect(['user/login']);
+        } else {
+            $models = OrderGoods::find()->where(['member_id' => \Yii::$app->user->id])->all();
+            $pending = 0;
+            $unconfirmed = 0;
+            $since = 0;
+            $pendings = 0;
+            foreach ($models as $model) {
+                $time = Order::findOne(['id' => $model->order_id]);
+                if ($time['status'] === 1) {
+                    $pending++;
+                };
+                if ($time['status'] === 4) {
+                    $unconfirmed++;
+                }
+                if ($time['status'] === 3) {
+                    $since++;
+                }
+                if ($time['status'] === 2) {
+                    $pendings++;
+                }
+            }
+
+            return $this->render('details', ['models' => $models, 'pending' => $pending, 'unconfirmed' => $unconfirmed, 'since' => $since, 'pendings' => $pendings]);
+        }
+    }
+
+    public function jump($time = 0, $url, $js)
+    {//提示页面的方法
+        require './point/point.php';
+        header("Refresh: $time;url='$url'");
+    }
+
+    public function tishi($time = 0, $url)
+    {//提示页面的方法
+        require './point/flow3.html';
+        header("Refresh: $time;url='$url'");
     }
 
     //>>注销
