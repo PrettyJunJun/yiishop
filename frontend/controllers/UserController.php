@@ -99,7 +99,7 @@ class UserController extends Controller
                     }
                     echo '登录成功';
                     sleep(1);
-                    return $this->redirect(['site/index']);
+                    return $this->redirect('http://www.prettyjun.cn');
                 }
             }
         }
