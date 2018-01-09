@@ -11,6 +11,7 @@ use frontend\models\LoginForm;
 use frontend\models\Member;
 use frontend\models\Order;
 use frontend\models\OrderGoods;
+use yii\data\Pagination;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 use yii\web\Controller;
@@ -367,65 +368,68 @@ class UserController extends Controller
                 $address = Address::findOne(['id' => $model->address_id]);
 //                var_dump($model);die;
                 if (!$address) {
-                    return $this->jump(3, '/user/address.php', '收获地址不存在,请填写有效的收货地址');
+                    return $this->jump(3, '/user/address?id=' . \Yii::$app->user->id, '收获地址不存在,请填写有效的收货地址');
                 }
                 //>>开启事务
                 $transaction = \Yii::$app->db->beginTransaction();
                 try {
                     $carts = Cart::find()->where(['member_id' => \Yii::$app->user->id])->all();
                     $values = DetailAddress::findOne(['address_id' => $address->id]);
+                    $model->member_id = \Yii::$app->user->id;
+                    $model->name = $address->name;
+                    $model->province = $address->province;
+                    $model->city = $address->city;
+                    $model->area = $address->area;
+                    $model->address = $values->detail_address;
+                    $model->tel = $address->phone;
+//                            var_dump($address);die;
+//                            var_dump($model->delivery_id);die;
+                    $model->delivery_name = Order::$delivery[$model->delivery_id][0];
+                    $model->delivery_price = Order::$delivery[$model->delivery_id][1];//这是配送费的
+//                            var_dump($model->payment_id);die;
+                    $model->payment_name = Order::$payment[$model->payment_id][0];
+                    $model->status = 1;
+                    $model->create_time = time();
                     //>>遍历购物车里面的商品信息
                     foreach ($carts as $cart) {
                         $num = Goods::find()->where(['id' => $cart->goods_id])->one();
-                        if ($num->stock >= $cart->amount) {
-                            $model->member_id = \Yii::$app->user->id;
-                            $model->name = $address->name;
-                            $model->province = $address->province;
-                            $model->city = $address->city;
-                            $model->area = $address->area;
-                            $model->address = $values->detail_address;
-                            $model->tel = $address->phone;
-                            $model->delivery_price = $num->shop_price;
-//                            var_dump($address);die;
-//                            var_dump($model->delivery_id);die;
-                            $model->delivery_name = Order::$delivery[$model->delivery_id][0];
-//                            var_dump($model->payment_id);die;
-                            $model->payment_name = Order::$payment[$model->payment_id][0];
-                            $value = 0;
-                            $value += $num->shop_price * $cart->amount;
-                            $model->total = $value;
-                            $model->status = 1;
-                            $model->create_time = time();
-                            if ($model->validate()) {
-                                $model->save();
-                                $id = \Yii::$app->db->getLastInsertID();
 
-                                $ordergoods = new OrderGoods();
-                                $ordergoods->order_id = $id;
-                                $ordergoods->goods_id = $num->id;
-                                $ordergoods->goods_name = $num->name;
-                                $ordergoods->logo = $num->logo;
-                                $ordergoods->price = $num->shop_price;
-                                $ordergoods->amount = $cart->amount;
-                                $ordergoods->total = $num->shop_price * $cart->amount;
-                                $ordergoods->member_id = \Yii::$app->user->id;
-                                $ordergoods->save();
-                                $transaction->commit();
-                                Goods::updateAll(['stock' => $num->stock - $cart->amount], ['id' => $cart->goods_id]);
-                                Cart::deleteAll(['id' => $cart->id]);
-                            } else {
-                                var_dump($model->getErrors());
-                                die;
-                            }
+                        if ($model->validate()) {
+                            $model->save();
+                        }
+                        if ($num->stock >= $cart->amount) {
+//                            var_dump($num->stock,$cart->amount);
+//                            var_dump(1);
+                            $id = $model->id;
+                            $ordergoods = new OrderGoods();
+                            $ordergoods->order_id = $id;
+                            $ordergoods->goods_id = $num->id;
+                            $ordergoods->goods_name = $num->name;
+                            $ordergoods->logo = $num->logo;
+                            $ordergoods->price = $num->shop_price;
+                            $ordergoods->amount = $cart->amount;
+                            $ordergoods->total = $num->shop_price * $cart->amount;
+                            $ordergoods->member_id = \Yii::$app->user->id;
+                            $ordergoods->save();
+                            //>>修改商品的库存的
+                            $num->stock -= $cart->amount;//修改商品的库存的
+                            $num->save(false);
+                            //>>这里是计算小计的没有加上运费的
+                            $model->total += $num->shop_price * $cart->amount;
                         } else {
                             throw new Exception('商品的库存不足');//抛出异常
                         }
+                        //>>计算总金额
+                        $model->total += $model->delivery_price;
+                        $model->save();
+                        Cart::deleteAll(['id' => $cart->id]);
+                        $transaction->commit();
                     }
-                    return $this->tishi(1, 'details');
-
+                    return $this->tishi(10000, 'details');
                 } catch (Exception $e) {//>>捕获异常
                     $transaction->rollBack();//>>事务回滚
-                    $this->jump(5, '/user/cart.php', $num->name . '商品的库存不足');
+//                    var_dump($num->stock,$cart->amount);die;
+                    $this->jump(3, '/user/cart', $num->name . '商品的库存不足');
 //                    $this->render(['user/order']);
                 }
             } else {
@@ -440,8 +444,9 @@ class UserController extends Controller
         }
     }
 
-    //>>订单详情
-    public function actionDetails()
+//>>订单详情
+    public
+    function actionDetails()
     {
         //判断用户是否登录
         if (\Yii::$app->user->isGuest) {
@@ -472,20 +477,23 @@ class UserController extends Controller
         }
     }
 
-    public function jump($time = 0, $url, $js)
+    public
+    function jump($time = 0, $url, $js)
     {//提示页面的方法
         require './point/point.php';
         header("Refresh: $time;url='$url'");
     }
 
-    public function tishi($time = 0, $url)
+    public
+    function tishi($time = 0, $url)
     {//提示页面的方法
         require './point/flow3.html';
         header("Refresh: $time;url='$url'");
     }
 
-    //>>注销
-    public function actionLogout()
+//>>注销
+    public
+    function actionLogout()
     {
         \Yii::$app->user->logout();
         return $this->redirect(['user/login']);

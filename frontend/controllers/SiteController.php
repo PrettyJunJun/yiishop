@@ -2,9 +2,11 @@
 
 namespace frontend\controllers;
 
+use backend\models\Goods;
 use backend\models\GoodsCategory;
 use Yii;
 use yii\base\InvalidParamException;
+use yii\data\Pagination;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
@@ -230,6 +232,17 @@ class SiteController extends Controller
             'model' => $model,
         ]);
     }
+
+//    //>>搜索
+//    public function actionSearch()
+//    {
+//        $name = Yii::$app->request->get(['goods_name']);
+//        $query = Goods::find();
+//        //>>根据ID找到商品信息
+//        $goods = $query->where(['like', 'name', $name])->all();
+////        var_dump($value);die;
+//        return $this->render('index',['goods'=>$goods]);
+//    }
 
 //    public function actionRegist(){
 //

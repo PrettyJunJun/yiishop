@@ -48,4 +48,15 @@ class GoodsListController extends Controller
 //        var_dump($gallerys);die;
         return $this->render('goods', ['row' => $row, 'intro' => $intro, 'gallerys' => $gallerys]);
     }
+
+    //>>搜索
+    public function actionSearch()
+    {
+        $name = $_GET['goods_name'];
+        $query = Goods::find();
+        //>>根据ID找到商品信息
+        $goods = $query->where(['like', 'name', $name])->all();
+//        var_dump($value);die;
+        return $this->render('index', ['goods' => $goods]);
+    }
 }
