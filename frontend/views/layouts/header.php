@@ -24,7 +24,7 @@
         </div>
         <div class="topnav_right fr">
             <ul>
-                <li><?= Yii::$app->user->isGuest ? "游客" : Yii::$app->user->identity->username ?>
+                <li id="user_status"><?= Yii::$app->user->isGuest ? "游客" : Yii::$app->user->identity->username ?>
                     您好！欢迎来到京西！<?= Yii::$app->user->isGuest ? '[<a href="' . \yii\helpers\Url::to(['user/login']) . '">登录</a>][<a href="' . yii\helpers\Url::to(['user/regist']) . '">免费注册</a>]' : '[<a href="' . \yii\helpers\Url::to(['user/logout']) . '">注销</a>]' ?> </li>
 
                 <li class="line">|</li>
@@ -166,4 +166,17 @@
 <!-- 头部 end-->
 
 <div style="clear:both;"></div>
+<script type="text/javascript">
+    //>>发送ajax请求获取用户登录状态 根据用户的登录改变状态栏的用户信息
+    $.getJSON("<?=\yii\helpers\Url::to(['site/user-status'])?>",function (json) {
+        if (json.isLogin){
+            $('#user_status').html(json.username+",欢迎来到京西商城 " +
+                "<a href='<?=\yii\helpers\Url::to(['user/logout'])?>'>[注销]</a>");
+        }else {
+            $('#user_status').html('您好,欢迎来到京西商城 ' +
+                '<a href="<?=\yii\helpers\Url::to(['user/regist'])?>">[免费注册]</a> " +
+            "<a href="<?=\yii\helpers\Url::to(['user/login'])?>">[登陆]</a>')
+        }
+    });
+</script>
 <?= $content ?>

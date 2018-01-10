@@ -94,7 +94,27 @@ class SiteController extends Controller
             }
         }
 //        var_dump(Yii::$app->user->isGuest);die;
-        return $this->render('index', ['parent_id' => $parent_id, 'goods' => $goods, 'rows' => $rows, 'Categorys' => $Categorys]);
+        $contents = $this->render('index', ['parent_id' => $parent_id, 'goods' => $goods, 'rows' => $rows, 'Categorys' => $Categorys]);
+        //>>将首页内容保存到静态页面内
+        file_put_contents('index.html', $contents);
+//        return $contents;
+        echo "首页静态化完成";
+    }
+
+    //>>获取用户登录状态
+    public function actionUserStatus()
+    {
+        $result = [
+            'isLogin' => '',
+            'username' => ''
+        ];
+        if (\Yii::$app->user->isGuest) {
+            $result['isLogin'] = false;
+        } else {
+            $result['isLogin'] = true;
+            $result['username'] = \Yii::$app->user->identity->username;
+        }
+        return json_encode($result);
     }
 
     /**
@@ -329,5 +349,18 @@ class SiteController extends Controller
 //
 //            var_dump($content);
         }
+    }
+
+    //>>发送邮件
+    public function actionEmail(){
+        Yii::$app->mailer->compose()
+             ->setFrom('18783807924@163.com')
+             ->setTo('18783807924@163.com')
+             ->setSubject('邮件主题:阿里云备案《已经提交通管局》通知')
+            ->setHtmlBody('<span style="color: #ff000d">尊敬的彭峻：</span>
+ 
+	您的备案信息已经提交至通信管理局审核！
+彭峻的备案信息（订单号：25120619716）已经为您提交至省通信管理局审核，审核结果将由管局直接发短信和邮件通知您，请耐心等待，您也可以登录阿里云代备案系统查看管局审核结果。')
+            ->send();
     }
 }

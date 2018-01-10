@@ -11,6 +11,7 @@ use frontend\models\LoginForm;
 use frontend\models\Member;
 use frontend\models\Order;
 use frontend\models\OrderGoods;
+use function Qiniu\waterImg;
 use yii\data\Pagination;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
@@ -385,24 +386,21 @@ class UserController extends Controller
 //                            var_dump($address);die;
 //                            var_dump($model->delivery_id);die;
                     $model->delivery_name = Order::$delivery[$model->delivery_id][0];
-                    $model->delivery_price = Order::$delivery[$model->delivery_id][1];//这是配送费的
+                    $model->delivery_price = Order::$delivery[$model->delivery_id][1];
 //                            var_dump($model->payment_id);die;
                     $model->payment_name = Order::$payment[$model->payment_id][0];
                     $model->status = 1;
+                    $model->total = 0;
                     $model->create_time = time();
                     //>>遍历购物车里面的商品信息
+                    if ($model->validate()) {
+                        $model->save();
+                    }
                     foreach ($carts as $cart) {
                         $num = Goods::find()->where(['id' => $cart->goods_id])->one();
-
-                        if ($model->validate()) {
-                            $model->save();
-                        }
                         if ($num->stock >= $cart->amount) {
-//                            var_dump($num->stock,$cart->amount);
-//                            var_dump(1);
-                            $id = $model->id;
                             $ordergoods = new OrderGoods();
-                            $ordergoods->order_id = $id;
+                            $ordergoods->order_id = $model->id;
                             $ordergoods->goods_id = $num->id;
                             $ordergoods->goods_name = $num->name;
                             $ordergoods->logo = $num->logo;
@@ -411,21 +409,25 @@ class UserController extends Controller
                             $ordergoods->total = $num->shop_price * $cart->amount;
                             $ordergoods->member_id = \Yii::$app->user->id;
                             $ordergoods->save();
-                            //>>修改商品的库存的
-                            $num->stock -= $cart->amount;//修改商品的库存的
+                            //>>修改商品的库存
+                            $num->stock -= $cart->amount;
                             $num->save(false);
-                            //>>这里是计算小计的没有加上运费的
-                            $model->total += $num->shop_price * $cart->amount;
+
+                            $model->total += $ordergoods->total;
                         } else {
-                            throw new Exception('商品的库存不足');//抛出异常
+                            //>>抛出异常
+                            throw new Exception('商品的库存不足');
                         }
-                        //>>计算总金额
-                        $model->total += $model->delivery_price;
-                        $model->save();
-                        Cart::deleteAll(['id' => $cart->id]);
-                        $transaction->commit();
                     }
-                    return $this->tishi(10000, 'details');
+                    //>>计算总金额
+                    $model->total += $model->delivery_price;
+                    $model->save();
+                    Cart::deleteAll(['id' => $cart->id]);
+                    $userEmail = \Yii::$app->user->identity->email;
+                    $this->Email($userEmail);
+                    //提交事务>>>
+                    $transaction->commit();
+                    return $this->tishi(100, 'details');
                 } catch (Exception $e) {//>>捕获异常
                     $transaction->rollBack();//>>事务回滚
 //                    var_dump($num->stock,$cart->amount);die;
@@ -445,8 +447,7 @@ class UserController extends Controller
     }
 
 //>>订单详情
-    public
-    function actionDetails()
+    public function actionDetails()
     {
         //判断用户是否登录
         if (\Yii::$app->user->isGuest) {
@@ -477,25 +478,59 @@ class UserController extends Controller
         }
     }
 
-    public
-    function jump($time = 0, $url, $js)
+    public function jump($time = 0, $url, $js)
     {//提示页面的方法
         require './point/point.php';
         header("Refresh: $time;url='$url'");
     }
 
-    public
-    function tishi($time = 0, $url)
+    public function tishi($time = 0, $url)
     {//提示页面的方法
         require './point/flow3.html';
         header("Refresh: $time;url='$url'");
     }
 
 //>>注销
-    public
-    function actionLogout()
+    public function actionLogout()
     {
         \Yii::$app->user->logout();
         return $this->redirect(['user/login']);
+    }
+
+    //发送邮件
+    public function Email($userEmail)
+    {
+        \Yii::$app->mailer->compose()
+            ->setFrom('18783807924@163.com')
+            ->setTo($userEmail)
+            ->setSubject('邮件主题:提交订单')
+            ->setHtmlBody('<span style="color: #ff000d">订单提交成功</span>')
+            ->send();
+    }
+
+    //>>redis
+    public function actionReds()
+    {
+        //>>开启redis
+        $redis = new \Redis();
+        $redis->connect('127.0.0.1');
+        $redis->set('name', '张三', 10);
+        $redis->set('age', 18);
+        echo $redis->get('name');
+        echo $redis->get('age');
+    }
+
+    public function actionStatically()
+    {
+        $redis = new \Redis();
+        $redis->connect('127.0.0.1');
+        $name = $redis->get('name');
+        $age = $redis->get('age');
+        if ($name) {
+            $age += 1;
+        } else {
+            $age -= 1;
+        }
+        echo $age;
     }
 }

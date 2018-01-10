@@ -133,6 +133,15 @@
             </div>
             <!-- 支付方式  end-->
 
+<!--            <!-- 邮箱方式  start-->
+<!--            <div class="pay">-->
+<!--                <h3>填写邮箱 </h3>-->
+<!--                <div class="pay_select">-->
+<!--                <input type="text" style="color: #ff000d"/>-->
+<!--                </div>-->
+<!--            </div>-->
+            <!-- 邮箱方式  end-->
+
             <!-- 发票信息 start-->
             <div class="receipt none">
                 <h3>发票信息 </h3>
