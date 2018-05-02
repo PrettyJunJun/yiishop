@@ -38,7 +38,6 @@ $js =
         var id = $(this).attr('id');
         $(this).closest('tr').remove();
         $.getJSON('$url?id='+id,function(data) {
-          
         })
    });
 JS;

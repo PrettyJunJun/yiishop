@@ -36,7 +36,8 @@ class Password extends Model
     {
         if ($this->oldpassword) {
             //>>判断是否填写旧密码
-            $id = \Yii::$app->request->get('id');
+//            $id = \Yii::$app->request->get('id');
+            $id = 51;
             $password = User::findOne(['id' => $id]);
             if (\Yii::$app->security->validatePassword($this->oldpassword, $password->password_hash)) {
                 if (!$this->newpassword) {
@@ -56,6 +57,8 @@ class Password extends Model
             //>>如果没有填写旧密码 就不修改
             $this->addError('oldpassword', '旧密码不能为空');
         }
+
+        return true;
     }
 
 }

@@ -49,8 +49,9 @@
         <div class="search fl">
             <div class="search_form">
                 <div class="form_left fl"></div>
-                <form action="<?=\yii\helpers\Url::to(['goods-list/search'])?>" method="get" class="fl">
-                    <input name="goods_name" id="search" type="text" class="txt" value="请输入商品关键字"/>
+                <form action="<?= \yii\helpers\Url::to(['goods-list/search']) ?>" method="get" class="fl">
+                    <input name="goods_name" id="search" type="text" class="txt"
+                           value="<?= isset($info) ? $info : '请输入商品关键字' ?>"/>
                     <input type="submit" id="my_input" class="btn" value="搜索"/>
                 </form>
                 <div class="form_right fl"></div>
@@ -168,14 +169,15 @@
 <div style="clear:both;"></div>
 <script type="text/javascript">
     //>>发送ajax请求获取用户登录状态 根据用户的登录改变状态栏的用户信息
-    $.getJSON("<?=\yii\helpers\Url::to(['site/user-status'])?>",function (json) {
-        if (json.isLogin){
-            $('#user_status').html(json.username+",欢迎来到京西商城 " +
+    $.getJSON("<?=\yii\helpers\Url::to(['site/user-status'])?>", function (json) {
+        if (json.isLogin) {
+            $('#user_status').html(json.username + ",欢迎来到京西商城 " +
                 "<a href='<?=\yii\helpers\Url::to(['user/logout'])?>'>[注销]</a>");
-        }else {
+        } else {
             $('#user_status').html('您好,欢迎来到京西商城 ' +
                 '<a href="<?=\yii\helpers\Url::to(['user/regist'])?>">[免费注册]</a> " +
-            "<a href="<?=\yii\helpers\Url::to(['user/login'])?>">[登陆]</a>')
+            "<a href="
+            <?=\yii\helpers\Url::to(['user/login'])?>">[登陆]</a>')
         }
     });
 </script>

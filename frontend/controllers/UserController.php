@@ -101,7 +101,7 @@ class UserController extends Controller
                     }
                     echo '登录成功';
                     sleep(1);
-                    return $this->redirect('http://www.prettyjun.cn');
+                    return $this->redirect('/index.html');
                 }
             }
         }
@@ -509,7 +509,7 @@ class UserController extends Controller
     }
 
     //>>redis
-    public function actionReds()
+    public function actionRedis()
     {
         //>>开启redis
         $redis = new \Redis();
@@ -522,6 +522,7 @@ class UserController extends Controller
 
     public function actionStatically()
     {
+        //>>开启redis
         $redis = new \Redis();
         $redis->connect('127.0.0.1');
         $name = $redis->get('name');

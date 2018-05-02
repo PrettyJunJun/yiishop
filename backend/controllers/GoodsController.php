@@ -9,6 +9,7 @@ use backend\models\GoodsCategory;
 use backend\models\GoodsDayCount;
 use backend\models\GoodsGallery;
 use backend\models\GoodsIntro;
+use common\models\SphinxClient;
 use Qiniu\Auth;
 use Qiniu\Storage\UploadManager;
 use yii\data\Pagination;
@@ -254,6 +255,8 @@ class GoodsController extends Controller
         GoodsIntro::deleteAll(['goods_id' => $id]);
         echo json_encode($result);
     }
+
+
 
 //    public function behaviors()
 //    {

@@ -87,8 +87,7 @@ class UserController extends Controller
         if ($request->isPost) {
             $model->load($request->post());
             if ($model->validate()) {
-                $model->save(false);
-                //>>修改清除所有角色
+                $model->save(false);//revoke
                 $authManager->revokeAll($id);
                 //>>给用户添加角色
                 if ($model->roles) {
@@ -192,14 +191,5 @@ class UserController extends Controller
 
         return $this->redirect(['user/login']);
     }
-
-//    public function behaviors()
-//    {
-//        return [
-//            'rbac'=>[
-//                'class'=>RbacFilter::className()
-//            ]
-//        ];
-//    }
-
+    
 }

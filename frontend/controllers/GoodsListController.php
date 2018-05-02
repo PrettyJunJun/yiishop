@@ -7,6 +7,8 @@ use backend\models\Goods;
 use backend\models\GoodsCategory;
 use backend\models\GoodsGallery;
 use backend\models\GoodsIntro;
+use common\models\SphinxClient;
+use yii\data\Pagination;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 
@@ -50,13 +52,49 @@ class GoodsListController extends Controller
     }
 
     //>>搜索
+//    public function actionSearch()
+//    {
+//        $name = $_GET['goods_name'];
+//        $query = Goods::find();
+//        //>>根据ID找到商品信息
+//        $goods = $query->where(['like', 'name', $name])->all();
+////        var_dump($value);die;
+//        return $this->render('index', ['goods' => $goods]);
+//    }
+
+    //>>商品分词搜索功能
     public function actionSearch()
     {
-        $name = $_GET['goods_name'];
-        $query = Goods::find();
-        //>>根据ID找到商品信息
-        $goods = $query->where(['like', 'name', $name])->all();
-//        var_dump($value);die;
-        return $this->render('index', ['goods' => $goods]);
+        $name = \Yii::$app->request->get('goods_name');
+        $cl = new SphinxClient();
+        $cl->SetServer('127.0.0.1', 9312);
+        //$cl->SetServer ( '10.6.0.6', 9312);
+        //$cl->SetServer ( '10.6.0.22', 9312);
+        //$cl->SetServer ( '10.8.8.2', 9312);
+        $cl->SetConnectTimeout(10);
+        $cl->SetArrayResult(true);
+        //$cl->SetMatchMode ( SPH_MATCH_ANY);
+        $cl->SetMatchMode(SPH_MATCH_EXTENDED2);
+        $cl->SetLimits(0, 1000);
+        $info = $name;//>>查询关键字
+        $res = $cl->Query($info, 'mysql');//>>查询用到的索引
+        //print_r($cl);
+        //print_r($res);
+        $ids = [];
+        if (isset($res['matches'])) {
+            foreach ($res['matches'] as $match) {
+                $ids[] = $match['id'];
+            }
+        }
+//        var_dump($ids);
+        $total = Goods::find()->where(['in', 'id', $ids])->count();
+        $pager = new Pagination([
+            'totalCount' => $total,
+            'defaultPageSize' => 10
+        ]);
+        $goods = Goods::find()->limit($pager->limit)->offset($pager->offset)->where(['like', 'name', $info])->all();
+
+        return $this->render('index', ['goods' => $goods, 'pager' => $pager, 'info' => $info]);
+
     }
 }
